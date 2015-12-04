@@ -53,6 +53,6 @@ function ListCommandFactory.create()
     return nil
   end
 
-  return m 
+  return m
 
 end

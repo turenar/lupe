@@ -76,5 +76,5 @@ function InfoCommandFactory.create()
     return nil
   end
 
-  return m 
+  return m
 end

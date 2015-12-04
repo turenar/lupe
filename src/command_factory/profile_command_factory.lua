@@ -56,7 +56,7 @@ function ProfileCommandFactory.create()
         return true
       end
     end
-    
+
     return nil
   end
 

@@ -32,8 +32,8 @@ function DefinedLineCommandFactory.create()
           local source = defined_line.source or '-'
           local line   = defined_line.line   or -1
           debugger.writer:writeln(string.format('%s:%d ', source, line))
-        end 
-        
+        end
+
         return true
       end
     end

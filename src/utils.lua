@@ -134,7 +134,7 @@ function Utils.create()
   -- max_level: 表示する階層の最大値
   -- level: 現在の階層
   local function _inspect(value, max_level, level)
-    
+
     local str = ''
 
     local t = type(value)
@@ -143,7 +143,7 @@ function Utils.create()
         return '...'
       end
 
-      local indent = '' 
+      local indent = ''
       for i = 1, level do
         indent = indent .. ' '
       end

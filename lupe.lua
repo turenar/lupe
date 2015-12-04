@@ -1,5 +1,5 @@
 -- LUPE
--- built at 2015-01-04 17:46:05
+-- built at 2015-12-04 20:40:07
 -- Author: Takuya Ueda
 
 --- utils.lua
@@ -138,7 +138,7 @@ function Utils.create()
   -- max_level: 表示する階層の最大値
   -- level: 現在の階層
   local function _inspect(value, max_level, level)
-    
+
     local str = ''
 
     local t = type(value)
@@ -147,7 +147,7 @@ function Utils.create()
         return '...'
       end
 
-      local indent = '' 
+      local indent = ''
       for i = 1, level do
         indent = indent .. ' '
       end
@@ -1149,8 +1149,8 @@ function DefinedLineCommandFactory.create()
           local source = defined_line.source or '-'
           local line   = defined_line.line   or -1
           debugger.writer:writeln(string.format('%s:%d ', source, line))
-        end 
-        
+        end
+
         return true
       end
     end
@@ -1168,7 +1168,7 @@ local EvalCommandFactory = {}
 --- EvalCommandFactoryを作る．
 function EvalCommandFactory.create()
   local m = {}
- 
+
   --- evalコマンドを作る．
   -- line: 入力された文字列
   -- evalコマンド
@@ -1270,7 +1270,7 @@ function InfoCommandFactory.create()
     return nil
   end
 
-  return m 
+  return m
 end
 --- list_command_factory.lua
 
@@ -1327,7 +1327,7 @@ function ListCommandFactory.create()
     return nil
   end
 
-  return m 
+  return m
 
 end
 --- profile_command_factory.lua
@@ -1388,7 +1388,7 @@ function ProfileCommandFactory.create()
         return true
       end
     end
-    
+
     return nil
   end
 

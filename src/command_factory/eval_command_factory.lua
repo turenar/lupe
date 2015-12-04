@@ -6,7 +6,7 @@ local EvalCommandFactory = {}
 --- EvalCommandFactoryを作る．
 function EvalCommandFactory.create()
   local m = {}
- 
+
   --- evalコマンドを作る．
   -- line: 入力された文字列
   -- evalコマンド
