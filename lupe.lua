@@ -1,5 +1,5 @@
 -- LUPE
--- built at 2015-12-04 20:40:07
+-- built at 2015-12-04 20:40:22
 -- Author: Takuya Ueda
 
 --- utils.lua
@@ -1318,7 +1318,7 @@ function ListCommandFactory.create()
           end
 
           local fmt = '%' .. tostring(utils:numDigits(#lines)) .. 'd: %s'
-          print(string.format(fmt, i, lines[i]))
+          debugger.writer:writeln(string.format(fmt, i, lines[i]))
         end
 
         return true
