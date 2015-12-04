@@ -75,5 +75,40 @@ function WatchCommandFactory.create()
     return nil
   end
 
+  function m:help(debugger, cmd)
+    local help_shown = false
+    if cmd == nil or cmd == 'watch' or cmd == 'w' then
+      debugger.writer:writeln('watch')
+      if cmd ~= nil then
+        debugger.writer:writeln('    w')
+        debugger.writer:writeln('Show watching chunk list')
+      end
+      help_shown = true
+    end
+
+    if cmd == nil or cmd == 'setWatch' or cmd == 'sw' then
+      debugger.writer:writeln('setWatch <CHUNK> [WATCH_ID]')
+      if cmd ~= nil then
+        debugger.writer:writeln('     sw <CHUNK> [WATCH_ID]')
+        debugger.writer:writeln('Add watching chunk or set alternative chunk as specified watcher')
+        debugger.writer:writeln('  CHUNK: valid lua chunk (ex. variable, func())')
+        debugger.writer:writeln('  WATCH_ID: if set, replace watcher rather than create new watcher')
+      end
+      help_shown = true
+    end
+
+    if cmd == nil or cmd == 'removeWatch' or cmd == 'rw' then
+      debugger.writer:writeln('removeWatch <WATCH_ID>')
+      if cmd ~= nil then
+        debugger.writer:writeln('         rw <WATCH_ID>')
+        debugger.writer:writeln('Remove specified watcher')
+        debugger.writer:writeln('  WATCH_ID: watcher id')
+      end
+      help_shown = true
+    end
+
+    return help_shown
+  end
+
   return m
 end

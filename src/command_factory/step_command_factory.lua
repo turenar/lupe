@@ -48,5 +48,40 @@ function StepCommandFactory.create()
     return nil
   end
 
+  function m:help(debugger, cmd)
+    local help_shown = false
+    if cmd == nil or cmd == 'step' or cmd == 's' then
+      debugger.writer:writeln('step [N]')
+      if cmd ~= nil then
+        debugger.writer:writeln('   s [N]')
+        debugger.writer:writeln('Step program, proceeding through subroutine calls')
+        debugger.writer:writeln('  N: step times')
+      end
+      help_shown = true
+    end
+
+    if cmd == nil or cmd == 'stepIn' or cmd == 'si' then
+      debugger.writer:writeln('stepIn [N]')
+      if cmd ~= nil then
+        debugger.writer:writeln('    si [N]')
+        debugger.writer:writeln('Step program until it reaches a different statement')
+        debugger.writer:writeln('  N: step times')
+      end
+      help_shown = true
+    end
+
+    if cmd == nil or cmd == 'stepOut' or cmd == 'so' then
+      debugger.writer:writeln('stepOut [N]')
+      if cmd ~= nil then
+        debugger.writer:writeln('     so [N]')
+        debugger.writer:writeln('Continue execution until specified stack frames return')
+        debugger.writer:writeln('  N: frame count')
+      end
+      help_shown = true
+    end
+
+    return help_shown
+  end
+
   return m
 end

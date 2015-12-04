@@ -8,6 +8,7 @@ function Prompt.create()
 
   local m = {
     command_factories = {
+      HelpCommandFactory.create(),        -- ヘルプ
       StepCommandFactory.create(),        -- ステップ実行
       RunCommandFactory.create(),         -- Run
       BreakPointCommandFactory.create(),  -- ブレークポイント

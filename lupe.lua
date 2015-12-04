@@ -1,5 +1,5 @@
 -- LUPE
--- built at 2015-12-04 20:40:42
+-- built at 2015-12-04 20:40:54
 -- Author: Takuya Ueda
 
 --- utils.lua
@@ -1080,6 +1080,11 @@ function BreakPointCommandFactory.create()
     -- ブレークポイントの追加
     if cmd[1] == 'addBreakPoint' or cmd[1] == 'ab' then
       return function(debugger)
+        if cmd[2] == nil then
+          debugger.writer:writeln('missing argument')
+          self:help(debugger, 'ab')
+          return true
+        end
         if cmd[3] then
           debugger.break_point_manager:add(utils:withPrefixSource(cmd[2]), tonumber(cmd[3]))
         else
@@ -1092,6 +1097,11 @@ function BreakPointCommandFactory.create()
     -- ブレークポイントの削除
     if cmd[1] == 'removeBreakPoint' or cmd[1] == 'rb' then
       return function(debugger)
+        if cmd[2] == nil then
+          debugger.writer:writeln('missing argument')
+          self:help(debugger, 'rb')
+          return true
+        end
         if cmd[3] then
           debugger.break_point_manager:remove(utils:withPrefixSource(cmd[2]), tonumber(cmd[3]))
         else
@@ -1114,6 +1124,42 @@ function BreakPointCommandFactory.create()
     return nil
   end
 
+  function m:help(debugger, cmd)
+    local help_showed = false
+    if cmd == nil or cmd == 'addBreakPoint' or cmd == 'ab' then
+      debugger.writer:writeln('addBreakPoint [SOURCE] <LINE>')
+      if cmd ~= nil then
+        debugger.writer:writeln('           ab [SOURCE] <LINE>')
+        debugger.writer:writeln('Set breakpoint at specified line')
+        debugger.writer:writeln('  SOURCE: lua file name. (default: the source of top frame)')
+        debugger.writer:writeln('  LINE:   breakpoint line number')
+      end
+      help_showed = true
+    end
+
+    if cmd == nil or cmd == 'removeBreakPoint' or cmd == 'rb' then
+      debugger.writer:writeln('removeBreakPoint [SOURCE] <LINE>')
+      if cmd ~= nil then
+        debugger.writer:writeln('              rb [SOURCE] <LINE>')
+        debugger.writer:writeln('Remove breakpoint at specified line if set')
+        debugger.writer:writeln('  SOURCE: lua file name. (default: the source of top frame)')
+        debugger.writer:writeln('  LINE:   breakpoint line number')
+      end
+      help_showed = true
+    end
+
+    if cmd == nil or cmd == 'breakPointList' or line == 'bl' then
+      debugger.writer:writeln('breakPointList')
+      if cmd ~= nil then
+        debugger.writer:writeln('            bl')
+        debugger.writer:writeln('List breakpoints')
+      end
+      help_showed = true
+    end
+
+    return help_showed
+  end
+
   return m
 end
 --- defined_line_command_factory.lua
@@ -1123,7 +1169,7 @@ local DefinedLineCommandFactory = {}
 function DefinedLineCommandFactory.create()
   local m = {}
 
-  --- listコマンドを作る．
+  --- definedLineコマンドを作る．
   -- line: 入力された文字列
   -- 入力された文字列が definedLine コマンドに当てはまらなかった場合はnil
   -- そうでない場合 definedLine コマンド
@@ -1159,6 +1205,21 @@ function DefinedLineCommandFactory.create()
     return nil
   end
 
+  function m:help(debugger, cmd)
+    if cmd == nil or cmd == 'definedLine' or cmd == 'd' then
+      debugger.writer:writeln('definedLine [VAR_NAME]')
+      if cmd ~= nil then
+        debugger.writer:writeln('          d [VAR_NAME]')
+        debugger.writer:writeln('Guess location of variable definition')
+        debugger.writer:writeln('  VAR_NAME: the name of variable')
+      end
+      return true
+    else
+      return false
+    end
+  end
+
+
   return m
 end
 --- eval_command_factory.lua
@@ -1188,6 +1249,66 @@ function EvalCommandFactory.create()
       debugger.watch_manager:update(context)
 
       return true
+    end
+  end
+
+  function m:help(debugger, cmd)
+    -- eval は特別なヘルプを持たない
+    if cmd == nil then
+      debugger.writer:writeln(' or')
+      debugger.writer:writeln('<Lua chunk>')
+    end
+
+    return false
+  end
+
+  return m
+end
+--- help_command_factory.lua
+
+local HelpCommandFactory = {}
+
+function HelpCommandFactory.create()
+  local m = {}
+
+  --- ヘルプコマンドを作る．
+  -- line: 入力された文字列
+  -- 当てはまらなかったら，nil を返す．
+  function m:createCommand(line)
+    local cmd = utils:splitWords(line)
+    if not cmd and #cmd <= 0 then
+      return nil
+    end
+
+    -- ヘルプの表示
+    if cmd[1] == 'help' or cmd[1] == 'h' then
+      return function(debugger)
+        local help_shown = false
+        for _, command_factory in pairs(debugger.prompt.command_factories) do
+          help_shown = command_factory:help(debugger, cmd[2]) or help_shown
+        end
+
+        if not help_shown then
+          debugger.writer:writeln(string.format('%s: command is not found', cmd[1]))
+        end
+        return true
+      end
+    end
+
+    return nil
+  end
+
+  function m:help(debugger, cmd)
+    if cmd == nil or cmd == 'help' or cmd == 'h' then
+      debugger.writer:writeln('help [COMMAND]')
+      if cmd ~= nil then
+        debugger.writer:writeln('   h [COMMAND]')
+        debugger.writer:writeln('Show help')
+        debugger.writer:writeln('  COMMAND: command name that you want to see help')
+      end
+      return true
+    else
+      return false
     end
   end
 
@@ -1271,6 +1392,20 @@ function InfoCommandFactory.create()
     return nil
   end
 
+  function m:help(debugger, cmd)
+    if cmd == nil or cmd == 'info' or cmd == 'i' then
+      debugger.writer:writeln('info [(call_stack|break_points|watches)...]')
+      if cmd ~= nil then
+      	debugger.writer:writeln('   i [(call_stack|break_points|watches)...]')
+        debugger.writer:writeln('Show specified info')
+        debugger.writer:writeln('If argument is not passed, show all info')
+      end
+      return true
+    else
+      return false
+    end
+  end
+
   return m
 end
 --- list_command_factory.lua
@@ -1326,6 +1461,21 @@ function ListCommandFactory.create()
       end
     end
     return nil
+  end
+
+  function m:help(debugger, cmd)
+    if cmd == nil or cmd == 'list' or cmd == 'l' then
+      debugger.writer:writeln('list [NUM_LINES]')
+      if cmd ~= nil then
+        debugger.writer:writeln('   l [NUM_LINES]')
+        debugger.writer:writeln('List lines around current context.')
+        debugger.writer:writeln(string.format(
+            '  NUM_LINES: lines before or after current context (default: %d)', ListCommandFactory.DEFAULT_NUM_LINES))
+      end
+      return true
+    else
+      return false
+    end
   end
 
   return m
@@ -1393,6 +1543,38 @@ function ProfileCommandFactory.create()
     return nil
   end
 
+  function m:help(debugger, cmd)
+    local help_shown = false
+    if cmd == nil or cmd == 'startProfile' or cmd == 'sp' then
+      debugger.writer:writeln('startProfile')
+      if cmd ~= nil then
+        debugger.writer:writeln('          sp')
+        debugger.writer:writeln('Start profiler')
+      end
+      help_shown = true
+    end
+
+    if cmd == nil or cmd == 'profile' or cmd == 'p' then
+      debugger.writer:writeln('profile')
+      if cmd ~= nil then
+        debugger.writer:writeln('      p')
+        debugger.writer:writeln('Show profile summary')
+      end
+      help_shown = true
+    end
+
+    if cmd == nil or cmd == 'endProfile' or cmd == 'ep' then
+      debugger.writer:writeln('endProfile')
+      if cmd ~= nil then
+        debugger.writer:writeln('        ep')
+        debugger.writer:writeln('Stop profile')
+      end
+      help_shown = true
+    end
+
+    return help_shown
+  end
+
   return m
 
 end
@@ -1416,6 +1598,19 @@ function RunCommandFactory.create()
       end
     end
     return nil
+  end
+
+  function m:help(debugger, cmd)
+    if cmd == nil or cmd == 'run' or cmd == 'r' then
+      debugger.writer:writeln('run')
+      if cmd ~= nil then
+        debugger.writer:writeln('  r')
+        debugger.writer:writeln('Continue program')
+      end
+      return true
+    else
+      return false
+    end
   end
 
   return m
@@ -1470,6 +1665,41 @@ function StepCommandFactory.create()
     return nil
   end
 
+  function m:help(debugger, cmd)
+    local help_shown = false
+    if cmd == nil or cmd == 'step' or cmd == 's' then
+      debugger.writer:writeln('step [N]')
+      if cmd ~= nil then
+        debugger.writer:writeln('   s [N]')
+        debugger.writer:writeln('Step program, proceeding through subroutine calls')
+        debugger.writer:writeln('  N: step times')
+      end
+      help_shown = true
+    end
+
+    if cmd == nil or cmd == 'stepIn' or cmd == 'si' then
+      debugger.writer:writeln('stepIn [N]')
+      if cmd ~= nil then
+        debugger.writer:writeln('    si [N]')
+        debugger.writer:writeln('Step program until it reaches a different statement')
+        debugger.writer:writeln('  N: step times')
+      end
+      help_shown = true
+    end
+
+    if cmd == nil or cmd == 'stepOut' or cmd == 'so' then
+      debugger.writer:writeln('stepOut [N]')
+      if cmd ~= nil then
+        debugger.writer:writeln('     so [N]')
+        debugger.writer:writeln('Continue execution until specified stack frames return')
+        debugger.writer:writeln('  N: frame count')
+      end
+      help_shown = true
+    end
+
+    return help_shown
+  end
+
   return m
 end
 --- vars_command_factory.lua
@@ -1481,7 +1711,7 @@ function VarsCommandFactory.create()
     showDefinedLine = false,
   }
 
-  --- listコマンドを作る．
+  --- varsコマンドを作る．
   -- line: 入力された文字列
   -- 入力された文字列が vars コマンドに当てはまらなかった場合はnil
   -- そうでない場合 vars コマンド
@@ -1511,6 +1741,21 @@ function VarsCommandFactory.create()
     end
 
     return nil
+  end
+
+  function m:help(debugger, cmd)
+    if cmd == nil or cmd == 'vars' or cmd == 'v' then
+      debugger.writer:writeln('vars [LEVEL] [SHOW_DEPTH]')
+      if cmd ~= nil then
+        debugger.writer:writeln('   v [LEVEL [SHOW_DEPTH]]')
+        debugger.writer:writeln('Print variable')
+        debugger.writer:writeln('       LEVEL: stack level to inspect variables (default: 1)')
+        debugger.writer:writeln('  SHOW_DEPTH: table depth to show')
+      end
+      return true
+    else
+      return false
+    end
   end
 
   return m
@@ -1592,6 +1837,41 @@ function WatchCommandFactory.create()
     return nil
   end
 
+  function m:help(debugger, cmd)
+    local help_shown = false
+    if cmd == nil or cmd == 'watch' or cmd == 'w' then
+      debugger.writer:writeln('watch')
+      if cmd ~= nil then
+        debugger.writer:writeln('    w')
+        debugger.writer:writeln('Show watching chunk list')
+      end
+      help_shown = true
+    end
+
+    if cmd == nil or cmd == 'setWatch' or cmd == 'sw' then
+      debugger.writer:writeln('setWatch <CHUNK> [WATCH_ID]')
+      if cmd ~= nil then
+        debugger.writer:writeln('     sw <CHUNK> [WATCH_ID]')
+        debugger.writer:writeln('Add watching chunk or set alternative chunk as specified watcher')
+        debugger.writer:writeln('  CHUNK: valid lua chunk (ex. variable, func())')
+        debugger.writer:writeln('  WATCH_ID: if set, replace watcher rather than create new watcher')
+      end
+      help_shown = true
+    end
+
+    if cmd == nil or cmd == 'removeWatch' or cmd == 'rw' then
+      debugger.writer:writeln('removeWatch <WATCH_ID>')
+      if cmd ~= nil then
+        debugger.writer:writeln('         rw <WATCH_ID>')
+        debugger.writer:writeln('Remove specified watcher')
+        debugger.writer:writeln('  WATCH_ID: watcher id')
+      end
+      help_shown = true
+    end
+
+    return help_shown
+  end
+
   return m
 end
 --- prompt.lua
@@ -1604,6 +1884,7 @@ function Prompt.create()
 
   local m = {
     command_factories = {
+      HelpCommandFactory.create(),        -- ヘルプ
       StepCommandFactory.create(),        -- ステップ実行
       RunCommandFactory.create(),         -- Run
       BreakPointCommandFactory.create(),  -- ブレークポイント

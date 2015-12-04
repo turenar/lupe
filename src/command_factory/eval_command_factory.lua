@@ -28,5 +28,15 @@ function EvalCommandFactory.create()
     end
   end
 
+  function m:help(debugger, cmd)
+    -- eval は特別なヘルプを持たない
+    if cmd == nil then
+      debugger.writer:writeln(' or')
+      debugger.writer:writeln('<Lua chunk>')
+    end
+
+    return false
+  end
+
   return m
 end

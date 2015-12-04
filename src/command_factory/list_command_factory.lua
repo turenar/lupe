@@ -53,6 +53,21 @@ function ListCommandFactory.create()
     return nil
   end
 
+  function m:help(debugger, cmd)
+    if cmd == nil or cmd == 'list' or cmd == 'l' then
+      debugger.writer:writeln('list [NUM_LINES]')
+      if cmd ~= nil then
+        debugger.writer:writeln('   l [NUM_LINES]')
+        debugger.writer:writeln('List lines around current context.')
+        debugger.writer:writeln(string.format(
+            '  NUM_LINES: lines before or after current context (default: %d)', ListCommandFactory.DEFAULT_NUM_LINES))
+      end
+      return true
+    else
+      return false
+    end
+  end
+
   return m
 
 end

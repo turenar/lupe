@@ -7,7 +7,7 @@ function VarsCommandFactory.create()
     showDefinedLine = false,
   }
 
-  --- listコマンドを作る．
+  --- varsコマンドを作る．
   -- line: 入力された文字列
   -- 入力された文字列が vars コマンドに当てはまらなかった場合はnil
   -- そうでない場合 vars コマンド
@@ -37,6 +37,21 @@ function VarsCommandFactory.create()
     end
 
     return nil
+  end
+
+  function m:help(debugger, cmd)
+    if cmd == nil or cmd == 'vars' or cmd == 'v' then
+      debugger.writer:writeln('vars [LEVEL] [SHOW_DEPTH]')
+      if cmd ~= nil then
+        debugger.writer:writeln('   v [LEVEL [SHOW_DEPTH]]')
+        debugger.writer:writeln('Print variable')
+        debugger.writer:writeln('       LEVEL: stack level to inspect variables (default: 1)')
+        debugger.writer:writeln('  SHOW_DEPTH: table depth to show')
+      end
+      return true
+    else
+      return false
+    end
   end
 
   return m

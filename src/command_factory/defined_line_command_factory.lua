@@ -5,7 +5,7 @@ local DefinedLineCommandFactory = {}
 function DefinedLineCommandFactory.create()
   local m = {}
 
-  --- listコマンドを作る．
+  --- definedLineコマンドを作る．
   -- line: 入力された文字列
   -- 入力された文字列が definedLine コマンドに当てはまらなかった場合はnil
   -- そうでない場合 definedLine コマンド
@@ -40,6 +40,21 @@ function DefinedLineCommandFactory.create()
 
     return nil
   end
+
+  function m:help(debugger, cmd)
+    if cmd == nil or cmd == 'definedLine' or cmd == 'd' then
+      debugger.writer:writeln('definedLine [VAR_NAME]')
+      if cmd ~= nil then
+        debugger.writer:writeln('          d [VAR_NAME]')
+        debugger.writer:writeln('Guess location of variable definition')
+        debugger.writer:writeln('  VAR_NAME: the name of variable')
+      end
+      return true
+    else
+      return false
+    end
+  end
+
 
   return m
 end

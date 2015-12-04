@@ -20,5 +20,18 @@ function RunCommandFactory.create()
     return nil
   end
 
+  function m:help(debugger, cmd)
+    if cmd == nil or cmd == 'run' or cmd == 'r' then
+      debugger.writer:writeln('run')
+      if cmd ~= nil then
+        debugger.writer:writeln('  r')
+        debugger.writer:writeln('Continue program')
+      end
+      return true
+    else
+      return false
+    end
+  end
+
   return m
 end

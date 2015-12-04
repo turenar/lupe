@@ -60,6 +60,38 @@ function ProfileCommandFactory.create()
     return nil
   end
 
+  function m:help(debugger, cmd)
+    local help_shown = false
+    if cmd == nil or cmd == 'startProfile' or cmd == 'sp' then
+      debugger.writer:writeln('startProfile')
+      if cmd ~= nil then
+        debugger.writer:writeln('          sp')
+        debugger.writer:writeln('Start profiler')
+      end
+      help_shown = true
+    end
+
+    if cmd == nil or cmd == 'profile' or cmd == 'p' then
+      debugger.writer:writeln('profile')
+      if cmd ~= nil then
+        debugger.writer:writeln('      p')
+        debugger.writer:writeln('Show profile summary')
+      end
+      help_shown = true
+    end
+
+    if cmd == nil or cmd == 'endProfile' or cmd == 'ep' then
+      debugger.writer:writeln('endProfile')
+      if cmd ~= nil then
+        debugger.writer:writeln('        ep')
+        debugger.writer:writeln('Stop profile')
+      end
+      help_shown = true
+    end
+
+    return help_shown
+  end
+
   return m
 
 end

@@ -76,5 +76,19 @@ function InfoCommandFactory.create()
     return nil
   end
 
+  function m:help(debugger, cmd)
+    if cmd == nil or cmd == 'info' or cmd == 'i' then
+      debugger.writer:writeln('info [(call_stack|break_points|watches)...]')
+      if cmd ~= nil then
+      	debugger.writer:writeln('   i [(call_stack|break_points|watches)...]')
+        debugger.writer:writeln('Show specified info')
+        debugger.writer:writeln('If argument is not passed, show all info')
+      end
+      return true
+    else
+      return false
+    end
+  end
+
   return m
 end
