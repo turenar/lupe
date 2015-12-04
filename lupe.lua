@@ -1,5 +1,5 @@
 -- LUPE
--- built at 2015-12-04 20:40:22
+-- built at 2015-12-04 20:40:42
 -- Author: Takuya Ueda
 
 --- utils.lua
@@ -661,7 +661,7 @@ local function eval51(chunk, lenv)
   return nil
 end
 
---- Lua 5.2用のeval関数．
+--- Lua 5.2, 5.3用のeval関数．
 -- chunk: 実行するLuaコード
 -- lenv: 実行する環境
 local function eval52(chunk, lenv)
@@ -680,10 +680,11 @@ end
 local Evaluator = {}
 
 -- Luaのバージョンでチャンクを実行する関数が違う
-if _VERSION == 'Lua 5.2' then
-  Evaluator.EVAL_FUNC = eval52
-else
+if _VERSION == 'Lua 5.1' then
   Evaluator.EVAL_FUNC = eval51
+else
+  -- Lua 5.3もeval52で
+  Evaluator.EVAL_FUNC = eval52
 end
 
 --- Evaluatorを作る．
