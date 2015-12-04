@@ -60,11 +60,11 @@ function InfoCommandFactory.create()
         end
 
         while cmd[cmd_index] do
-          if cmd[cmd_index] == 'call_stack' then
+          if cmd[cmd_index] == 'frame' or cmd[cmd_index] == 'f' then
             call_stack_cmd(debugger)
-          elseif cmd[cmd_index] == 'break_points' then
+          elseif cmd[cmd_index] == 'breakpoint' or cmd[cmd_index] == 'b' then
             break_points_cmd(debugger)
-          elseif cmd[cmd_index] == 'watches' then
+          elseif cmd[cmd_index] == 'watchpoint' or cmd[cmd_index] == 'w' or cmd[cmd_index] == 'wat' then
             watches_cmd(debugger)
           end
           cmd_index = cmd_index + 1
@@ -78,9 +78,11 @@ function InfoCommandFactory.create()
 
   function m:help(debugger, cmd)
     if cmd == nil or cmd == 'info' or cmd == 'i' then
-      debugger.writer:writeln('info [(call_stack|break_points|watches)...]')
+      debugger.writer:writeln('info f[rame]')
+      debugger.writer:writeln('info b[reakpoint]')
+      debugger.writer:writeln('info w[atchpoint]')
       if cmd ~= nil then
-      	debugger.writer:writeln('   i [(call_stack|break_points|watches)...]')
+      	debugger.writer:writeln('   or alias `i\'')
         debugger.writer:writeln('Show specified info')
         debugger.writer:writeln('If argument is not passed, show all info')
       end

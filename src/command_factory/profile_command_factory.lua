@@ -23,15 +23,16 @@ function ProfileCommandFactory.create()
       return nil
     end
 
-    if cmd[1] == 'startProfile' or cmd[1] == 'sp' then
+    if not (cmd[1] == 'profile' or cmd[1] == 'p') then
+      return nil
+    end
+    if cmd[2] == 'start' or cmd[2] == 's' then
       return function(debugger)
         debugger:startProfile()
         debugger.writer:writeln('start profiler')
         return true
       end
-    end
-
-    if cmd[1] == 'profile' or cmd[1] == 'p' then
+    elseif cmd[2] == nil or cmd[2] == 'summary' then
       return function(debugger)
         if not m.last_profiler then
           debugger.writer:writeln('ERROR: profiler is running or does not start', 'ERROR')
@@ -46,9 +47,7 @@ function ProfileCommandFactory.create()
         debugger.writer:writeln(JSON.stringify(summary))
         return true
       end
-    end
-
-    if cmd[1] == 'endProfile' or cmd[1] == 'ep' then
+    elseif cmd[2] == 'end' or cmd[2] == 'e' then
       return function(debugger)
         m.last_profiler = debugger.profiler
         debugger:endProfile()
@@ -62,29 +61,14 @@ function ProfileCommandFactory.create()
 
   function m:help(debugger, cmd)
     local help_shown = false
-    if cmd == nil or cmd == 'startProfile' or cmd == 'sp' then
-      debugger.writer:writeln('startProfile')
-      if cmd ~= nil then
-        debugger.writer:writeln('          sp')
-        debugger.writer:writeln('Start profiler')
-      end
-      help_shown = true
-    end
 
     if cmd == nil or cmd == 'profile' or cmd == 'p' then
-      debugger.writer:writeln('profile')
+      debugger.writer:writeln('profile [summary]')
+      debugger.writer:writeln('profile s[tart]')
+      debugger.writer:writeln('profile e[nd]')
       if cmd ~= nil then
-        debugger.writer:writeln('      p')
-        debugger.writer:writeln('Show profile summary')
-      end
-      help_shown = true
-    end
-
-    if cmd == nil or cmd == 'endProfile' or cmd == 'ep' then
-      debugger.writer:writeln('endProfile')
-      if cmd ~= nil then
-        debugger.writer:writeln('        ep')
-        debugger.writer:writeln('Stop profile')
+        debugger.writer:writeln('  or alias `p\'')
+        debugger.writer:writeln('Show/Start/Stop profiler')
       end
       help_shown = true
     end

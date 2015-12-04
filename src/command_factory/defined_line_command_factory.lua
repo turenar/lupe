@@ -15,7 +15,7 @@ function DefinedLineCommandFactory.create()
       return nil
     end
 
-    if (cmd[1] == 'definedLine' or cmd[1] == 'd') and type(cmd[2]) == 'string' then
+    if (cmd[1] == 'vardef') and type(cmd[2]) == 'string' then
       return function(debugger)
         local var_name = cmd[2]
         local defined_line
@@ -42,10 +42,9 @@ function DefinedLineCommandFactory.create()
   end
 
   function m:help(debugger, cmd)
-    if cmd == nil or cmd == 'definedLine' or cmd == 'd' then
-      debugger.writer:writeln('definedLine [VAR_NAME]')
+    if cmd == nil or cmd == 'vardef' then
+      debugger.writer:writeln('vardef [VAR_NAME]')
       if cmd ~= nil then
-        debugger.writer:writeln('          d [VAR_NAME]')
         debugger.writer:writeln('Guess location of variable definition')
         debugger.writer:writeln('  VAR_NAME: the name of variable')
       end

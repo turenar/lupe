@@ -21,43 +21,42 @@ function WatchCommandFactory.create()
 
     -- ウォッチ式の一覧
     if cmd[1] == 'watch' or cmd[1] == 'w' then
-      return function(debugger)
-        local watches = debugger.watch_manager.watches
-        local fmt = '%' .. tostring(utils:numDigits(#watches)) .. 'd: %s = %s'
-        for i, watch in ipairs(watches) do
-          local str_value = utils:inspect(watch.value)
-          debugger.writer:writeln(string.format(fmt, i, watch.chunk, str_value))
-        end
-        return true
-      end
-    end
-
-    -- ウォッチ式の追加・更新
-    if cmd[1] == 'setWatch' or cmd[1] == 'sw' then
-      return function(debugger)
-        local context = debugger.call_stack[1]
-        local chunk, err
-        local index = tonumber(cmd[2])
-        if not index then
-          chunk = utils:join(utils:slice(cmd, 2), " ")
-          err   = debugger.watch_manager:add(context, chunk)
-        else
-          chunk = utils:join(utils:slice(cmd, 3), " ")
-          err   = debugger.watch_manager:set(index, context, chunk)
-        end
-
-        if err then
-          debugger.writer:writeln('ERROR: ' .. tostring(err))
+      if cmd[2] == nil then
+        return function(debugger)
+          local watches = debugger.watch_manager.watches
+          local fmt = '%' .. tostring(utils:numDigits(#watches)) .. 'd: %s = %s'
+          for i, watch in ipairs(watches) do
+            local str_value = utils:inspect(watch.value)
+            debugger.writer:writeln(string.format(fmt, i, watch.chunk, str_value))
+          end
           return true
         end
+      else
+        return function(debugger)
+          local context = debugger.call_stack[1]
+          local chunk, err
+          local index = tonumber(cmd[2])
+          if not index then
+            chunk = utils:join(utils:slice(cmd, 2), " ")
+            err   = debugger.watch_manager:add(context, chunk)
+          else
+            chunk = utils:join(utils:slice(cmd, 3), " ")
+            err   = debugger.watch_manager:set(index, context, chunk)
+          end
 
-        debugger.writer:writeln('add watch ' .. chunk)
-        return true
+          if err then
+            debugger.writer:writeln('ERROR: ' .. tostring(err))
+            return true
+          end
+
+          debugger.writer:writeln('add watch ' .. chunk)
+          return true
+        end
       end
     end
 
     -- ウォッチ式の削除
-    if cmd[1] == 'removeWatch' or cmd[1] == 'rw' then
+    if cmd[1] == 'delwatch' or cmd[1] == 'dw' then
       local index = tonumber(cmd[2])
       if not index then
         return nil
@@ -79,28 +78,21 @@ function WatchCommandFactory.create()
     local help_shown = false
     if cmd == nil or cmd == 'watch' or cmd == 'w' then
       debugger.writer:writeln('watch')
+      debugger.writer:writeln('watch <CHUNK> [WATCH_ID]')
       if cmd ~= nil then
-        debugger.writer:writeln('    w')
-        debugger.writer:writeln('Show watching chunk list')
-      end
-      help_shown = true
-    end
-
-    if cmd == nil or cmd == 'setWatch' or cmd == 'sw' then
-      debugger.writer:writeln('setWatch <CHUNK> [WATCH_ID]')
-      if cmd ~= nil then
-        debugger.writer:writeln('     sw <CHUNK> [WATCH_ID]')
-        debugger.writer:writeln('Add watching chunk or set alternative chunk as specified watcher')
+        debugger.writer:writeln('  or alias `w\'')
+        debugger.writer:writeln('If no arg passed, show watching chunk list')
+        debugger.writer:writeln('Otherwise, add watching chunk or set alternative chunk as specified watcher')
         debugger.writer:writeln('  CHUNK: valid lua chunk (ex. variable, func())')
         debugger.writer:writeln('  WATCH_ID: if set, replace watcher rather than create new watcher')
       end
       help_shown = true
     end
 
-    if cmd == nil or cmd == 'removeWatch' or cmd == 'rw' then
-      debugger.writer:writeln('removeWatch <WATCH_ID>')
+    if cmd == nil or cmd == 'delwatch' or cmd == 'dw' then
+      debugger.writer:writeln('delwatch <WATCH_ID>')
       if cmd ~= nil then
-        debugger.writer:writeln('         rw <WATCH_ID>')
+        debugger.writer:writeln('         dw <WATCH_ID>')
         debugger.writer:writeln('Remove specified watcher')
         debugger.writer:writeln('  WATCH_ID: watcher id')
       end
